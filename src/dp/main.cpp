@@ -4,6 +4,8 @@
 #include "cut_rod_memoization.hpp"
 #include "cut_rod_tabulation.hpp"
 #include "cut_rod_extended.hpp"
+#include "mat_chain_memoization.hpp"
+#include "mat_chain_tabulation.hpp"
 using namespace std;
 
 // Fib
@@ -16,6 +18,9 @@ int cut_rod_P[] = {0, 1, 5, 8, 9};
 int cut_rod_F = 10;
 int cut_rod_path_n = 2;
 int cut_rod_path_arr[] = {2, 2};
+
+// Mat Chain
+int mat_chain_p[] = {30, 35, 15, 5, 10, 20, 25};
 
 void spec_fib_tabulation()
 {
@@ -60,6 +65,20 @@ void spec_cut_rod_extended()
     assert(cut_rod_path_arr[i] == path[i]);
 }
 
+void spec_mat_chain_memoization()
+{
+  int n = sizeof(mat_chain_p) / sizeof(mat_chain_p[0]);
+  auto p = vector<int>(mat_chain_p, mat_chain_p + n);
+  assert(mat_chain_memoization(p) == 15125);
+}
+
+void spec_mat_chain_tabulation()
+{
+  int n = sizeof(mat_chain_p) / sizeof(mat_chain_p[0]);
+  auto p = vector<int>(mat_chain_p, mat_chain_p + n);
+  assert(mat_chain_tabulation(p) == 15125);
+}
+
 int main()
 {
   cout << "Starting DP Tests" << endl;
@@ -78,6 +97,12 @@ int main()
 
   spec_cut_rod_extended();
   cout << "\t ✅ cut_rod_extended" << endl;
+
+  spec_mat_chain_memoization();
+  cout << "\t ✅ mat_chain_memoization" << endl;
+
+  spec_mat_chain_tabulation();
+  cout << "\t ✅ mat_chain_tabulation" << endl;
 
   cout << "✅ DP tests" << endl;
 }

@@ -191,3 +191,115 @@ def print_cut_rod(n, s):
     print s[n]
     n = n - s[n]
 ```
+
+## Matrix Chain Multiplication
+When multiplying matrices, the order of multiplication matters, for example, assume we have three matrices $<A_1, A_2, A_3>$ with dimensions $10 \times 100, 100 \times 5, 5 \times 50$ respectively.
+
+If we do the multiplication as $(A_1 A_2) A_3$, we will do $10 * 5 * 50 + 10 * 5 * 50 = 5000 + 2500 = 7500$ operations.
+However if we do it as $A_1 (A_2 A_3)$, this will result in $100 * 5 * 50 + 10 * 100 * 50 = 25000 + 50000 = 75000$ operations, which is 10 times faster.
+
+*Note: Number of operations in matrix multiplication of $(n \times m) * (m \times r)$ is $n * m * r$* 
+
+The Matrix Chain Multiplication problem is the problem of parenthesizing the product of matrices in a way that minimizes the number of operations required for multiplication. $A_1 A_2...A_n$
+
+### Naive approach
+
+Applying a naive approach to this problem simply does not work due to the large number of combinations that can be generated, the number of combinations follows the following recurrence relation:
+
+![](assets/dp/Matrix_Chain_01.png)
+
+Which is $\Omega(2^n)$.
+
+### Recursive approach
+
+We can think about solving a general case, multiplying $A_1 A_2...A_n$.
+We are required to find a specific $k$ for which we split the multiplication into ($A_1 A_2...A_k$) ($A_{k+1} A_{k+2}...A_n$) such that the cost of multiplication is minimal.
+The cost of multiplication in this case is 
+$$Cost(A_1 A_2...A_k) + Cost(A_{k+1} A_{k+2}...A_n) + (p_0 * p_k * p_n)$$
+
+or for a more general case ($A_i A_{i+1}...A_k$) ($A_{k+1} A_{k+2}...A_{j}$) it is
+$$Cost(A_i A_{i+1}...A_k) + Cost(A_{k+1} A_{k+2}...A_{j}) + (p_{i-1} * p_k * p_j)$$
+
+*where a matrix $A_i$ has dimensions $p_{i-1} \times p_i$*
+
+We can then find a recurrence relation that translates the above:
+
+$m(i, j) = m(i, k) + m(k + 1, j) + p_{i-1}p_{k}p_{j}$
+
+with $m(i, j) = 0$ when $i = j$.
+
+The final form of the reccurence relation:
+
+![](assets/dp/Matrix_Chain_02.png)
+
+This can be implemented with **recursion**:
+
+```py
+def mat_chain(i, j):
+  if(i == j)
+    return 0
+  
+  q = inf
+  
+  for k in i:j-1
+    q = min(q, mat_chain(i, k) + mat_chain(k+1, j) + (p[i - 1] * p[k] * p[j]))
+  
+  return q
+```
+
+**Runtime is exponential**
+
+### Top-down approach
+We can take the previous recursive solution and apply **memoization** to it:
+
+```py
+def mat_chain(i, j):
+  if(i == j)
+    return 0
+  
+  if((i,j) in memo)
+    return memo[i, j]
+
+  q = inf
+  
+  for k in i:j-1
+    q = min(q, mat_chain(i, k) + mat_chain(k+1, j) + (p[i - 1] * p[k] * p[j]))
+  
+  memo[i, j] = q
+  return memo[i, j]
+```
+
+**Runtime:** $O(n^3)$
+
+## Bottom-up approach
+
+We can build up the smaller solutions by thinking backwards, computing smaller multiplications first and then bigger ones in sequence, we need to do this in a correct order to solve the problem of dependency in solutions.
+
+Visualizing the table of the DP helps:
+
+![](assets/dp/Matrix_Chain_03.png)
+
+We can notice that we need to start with chains of length 1 and work our way up to the maximum chain length.
+We can also compute the ideal position to parenthesis at on our way.
+
+```py
+def mat_chain(): 
+  n = p.length - 1    # p is sizes of matrices
+  m[1..n][1..n], s[1..n][1..n] = new array
+
+  for i in 1:n  
+    m[i, i] = 0       # chains with length = 1
+
+  for l in 1:n        # chains with length > 1
+    for i in 1:n-l+1  # i = start of chain
+      j = i + l - 1   # j = end of chain
+      m[i, j] = inf
+
+      for k in i:j-1  # try cutting at k for all k
+        q = m[i, k] + m[k+1, j] + p[i-1] * p[k] * p[j]
+        if q < m[i, j]
+          m[i, j] = q
+          s[i, j] = k
+  return m[1, n], s
+```
+**Runtime:** $O(n^3)$
