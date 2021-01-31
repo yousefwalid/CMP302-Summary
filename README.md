@@ -50,11 +50,10 @@ When solving any DP problem we must figure out these 3 things, usually finding o
 
 ## Complexity of DP
 
-- DP complexity = $O(\text{product of state size} * \text{function work})$
-
+- DP complexity = ![](https://latex.codecogs.com/svg.latex?O(\text{product%20of%20state%20size}%20*%20\text{function%20work}))
 Example: 
-State = $[1000][5000]$
-Complexity = $O(1000*5000*\text{function work})$
+State = ![](https://latex.codecogs.com/svg.latex?[1000][5000])
+Complexity = ![](https://latex.codecogs.com/svg.latex?1000*5000*\text{function%20work})
 
 ## Fibonacci
 
