@@ -9,12 +9,13 @@ int __rec_fib_memoization(int n, std::vector<int> &memo)
   if (dp != -1)
     return memo[n];
 
-  return memo[n] = __rec_fib_memoization(n - 1, memo) + __rec_fib_memoization(n - 2, memo);
+  dp = __rec_fib_memoization(n - 1, memo) + __rec_fib_memoization(n - 2, memo);
+  return dp;
 }
 
 int fib_memoization(int n)
 {
-  std::vector<int> memo(100005, -1);
+  std::vector<int> memo(n + 1, -1);
 
   return __rec_fib_memoization(n, memo);
 }

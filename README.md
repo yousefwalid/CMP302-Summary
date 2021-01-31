@@ -10,6 +10,7 @@ This repository is a summary for the course, it will contain my own implementati
   - [placeholder]()
 - [NP Completeness]()
 - [String Matching]()
+- [Appendix]()
 
 # Dynamic Programming
 
@@ -49,15 +50,15 @@ When solving any DP problem we must figure out these 3 things, usually finding o
 
 ## Complexity of DP
 
-- DP complexity = O(product of state size)
+- DP complexity = $O(\text{product of state size} * \text{function work})$
 
 Example: 
 State = $[1000][5000]$
-Complexity = $O(1000*5000)$
+Complexity = $O(1000*5000*\text{function work})$
 
 ## Fibonacci
 
-Fibonacci can be implemented recursively in a naive way as follows:
+Fibonacci can be implemented recursively in a **naive** way as follows:
 ```py
 def fib(n):
   if(n == 1 or n == 2)
@@ -67,21 +68,21 @@ def fib(n):
 ```
 However, this implementation is not very well as it is $O(2^n)$.
 
-We can improve this by adding memoization:
+We can improve this by adding **memoization**:
 ```py
 def fib(n):
   if(n == 1 or n == 2)
     return 1
-  else
-    if(n in memo)
-      return memo[n]
-    else
-      memo[n] = fib[n-1] + fib[n-2]
-      return memo[n]
-```
-This improves the complexity to $O(n)$, however this takes memory space $O(N)$ where $N$ is the largest fibonacci number, this also takes a lot of space in the stack as it is a recursive implementation.
+  
+  if(n in memo)
+    return memo[n]
 
-This can also be implemented with tabulation:
+  memo[n] = fib[n-1] + fib[n-2]
+  return memo[n]
+```
+This improves the complexity to $O(n)$, however this takes memory space $O(n)$.
+
+This can also be implemented with **tabulation**:
 ```py
 def fib(n):
   fib[0] = 0
@@ -92,3 +93,101 @@ def fib(n):
 ```
 
 ## Rod Cutting
+
+Cut rod of length n to maximize revenue based on a price table.
+![](assets/dp/Rod_Cutting_01.png)
+![](assets/dp/Rod_Cutting_02.png)
+
+Can be solved naively by:
+  1. Cut a piece at the left end of the rod, and sell it.
+  2. Find an optimal way to cut the remainder of the rod.
+```py
+def cut_rod(n, p): # p is array of prices of piece i
+  if (n == 0)
+    return 0
+
+  q = -inf
+  for i in 1:n
+    q = max(q, p[i] + cut_rod(p, n - i))
+
+  return q
+```
+
+**Runtime:** $O(2^n)$, we can try to optimize this algorithm using dynamic programming, but first we need to check if a DP approach is applicable, by inspecting the recursion tree:
+
+![](assets/dp/Rod_Cutting_03.png)
+
+This tree has $O(2^n)$ leaves which corresponds to the solution complexity, however we can notice a lot of **overlapping subproblems**.
+
+Implementing this with **memoization**:
+```py
+def cut_rod(n, p):
+  if (n == 0)
+    return 0
+
+  if (n in memo)
+    return memo[n]
+
+  q = -inf
+  for i in 1:n
+    q = max(q, p[i] + cut_rod(n - i, p))
+
+  memo[n] = q
+  return q
+```
+
+**Runtime:** $\Theta(n^2)$
+
+*Note the similarities between the memoization solution and the naive solution, they are very similar, the memoization solution is basically the naive solution but with an extra memoization part that checks if a subproblem has been calculated before.*
+
+We can also start from smaller rods and build our answer up to the bigger rods, implementing this with **tabulation**:
+
+```py
+def cut_rod(n, p):
+  r[0..n] = new array
+  r[0] = 0
+
+  for j in 1:n
+    q = -inf
+    for i in 1:j
+      q = max(q, p[i] + r[j - i])
+    r[j] = q
+
+  return r[n]
+```
+
+**Runtime:** $\Theta(n^2)$
+
+**Explanation:** $r[0..n]$ is an array containing the optimal answers for all cuts at any given iteration, for each rod length $n$ we can define its optimal answer as $max_{i=0}^{i=n}(p[i] + r[n - i])$. 
+*We attempt cutting a piece of length $i$ and add it to the optimal answer of $n - i$ for all possible $i$.*
+
+
+### Finding optimal cuts
+We have previously calculated the maximum profit of the rod cutting problem, we have yet to find the optimal way of cutting. We can achieve that by creating a new array and for a given $n$ store the length of the piece cut at the left of the rod.
+
+![](assets/dp/Rod_Cutting_04.png)
+
+```py
+def cut_rod_extended(n, p):
+  r[0..n], s[0..n] = new array
+  r[0] = 0
+
+  for j in 1:n
+    q = -inf
+
+    for i in 1:j
+      current_price = p[i] + r[j - i]
+      if q < r
+        s[n] = i
+        q = current_price
+
+    r[j] = q
+
+  return r[n], s
+
+
+def print_cut_rod(n, s):
+  while n > 0
+    print s[n]
+    n = n - s[n]
+```
