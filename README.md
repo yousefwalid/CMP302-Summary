@@ -5,9 +5,15 @@ This repository is a summary for the course, it will contain my own implementati
 # Table of Contents
 
 - [Dynamic Programming](#dynamic-programming)
+  - [Conditions for DP solution satisfaction](#conditions-for-dp-solution-satisfaction)
+  - [Types of DP solutions](#types-of-dp-solutions)
+  - [Top-down solution steps](#top-down-solution-steps)
+  - [Complexity of DP](#complexity-of-dp)
+  - [Fibonacci](#fibonacci)
+  - [Rod Cutting](#rod-cutting)
+  - [Matrix Chain Multiplication](#matrix-chain-multiplication)
 - [Greedy Algorithms]()
 - [Graphs]()
-  - [placeholder]()
 - [NP Completeness]()
 - [String Matching]()
 - [Appendix]()
@@ -16,13 +22,13 @@ This repository is a summary for the course, it will contain my own implementati
 
 A faster technique to solve divide-and-conquer problems, usually decreases running time from **exponential** to **linear**.
 
-## Conditions for DP solution satisfaction:
+## Conditions for DP solution satisfaction
 1. Optimal Substructure
     - An optimal solution to the problem can be constructed from the optimal solution of its subproblems.
 2. Overlapping Subproblems
     - Subproblems solutions are re-used multiple times.
 
-## Types of DP solutions:
+## Types of DP solutions
 A DP solution can be one of the following two types:
 1. Top-down approach **(Memoization)**
    - Start from the big problem and work your way down, decomposing the big problem to multiple smaller ones. 
@@ -34,8 +40,8 @@ A DP solution can be one of the following two types:
    - Saves memory space (no recursion required).
    - Harder to implement
 
-## Bottom-up solution steps
-Any bottom-up solution contains 3 major pillars.
+## Top-down solution steps
+Any Top-down solution contains 3 major pillars.
 1. Base case
     - The recursion termination condition
 2. State
@@ -271,7 +277,7 @@ def mat_chain(i, j):
 
 **Runtime:** $O(n^3)$
 
-## Bottom-up approach
+### Bottom-up approach
 
 We can build up the smaller solutions by thinking backwards, computing smaller multiplications first and then bigger ones in sequence, we need to do this in a correct order to solve the problem of dependency in solutions.
 
