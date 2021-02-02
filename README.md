@@ -309,3 +309,96 @@ def mat_chain():
   return m[1, n], s
 ```
 **Runtime:** $O(n^3)$
+
+# Greedy Algorithms
+
+- A greedy algorithm always makes the best choice currently.
+- Takes the locally optimal solution hoping to reach a globally optimal solution.
+- Does not guarantee optimal solutions, but a greedy solution is always at least sub-optimal.
+- Proving that a greedy solution is optimal or not is the hard part.
+- Much faster than other solutions
+- Good for optimization problems
+
+## Solution Steps
+
+1. Interpret the optimization problem as one we make a choice and are left with one smaller subproblem to solve.
+2. Prove there is an optimal solution to the original problem that makes the greedy choice.
+3. Make sure that combining the optimal solution to the subproblem we have left with the greedy choice we made will leave us with the optimal solution.
+
+## Activity Selection
+
+Find max subset of non-overlapping tasks.
+
+![](assets/greedy/activity_selection_01.png)
+
+A greedy solution may be as follows:
+```py
+def activity_selection():
+  sort tasks by finish time
+
+  k = -inf
+  A = []
+
+  for task, i in tasks
+    if s[i] >= k
+      k = f[i]
+      A.insert(task)
+
+  return A
+```
+
+**Runtime:** $O(nlogn)$
+
+We sort the tasks on finish times, and count the number of non-overlapping tasks from the least finish time up to the largest finish time.
+
+We can prove that this approach yields an optimal solution, like its dynamic programming counterpart, however, this algorithm is much faster.
+
+## Knapsack Problem
+
+### 0-1 Knapsack
+
+Thief trying to pick maximum value items while maintaining a maximum weight $W$, each item has a value $v_i$ and a weight $w_i$.
+
+0-1 Knapsack problem is always solved with dynamic programming as it guarantees the fastest optimal solution.
+
+There is no optimal greedy algorithm for solving this problem, that is because when making a local choice we cannot guarantee that it is globally optimal.
+
+### Fractional Knapsack
+
+Fractional Knapsack problem is similar to `0-1 Knapsack` but the thief can pick a fraction of the item.
+
+It is easy to find an optimal solution to this problem greedily. Find the item with the highest $value/pound$ and take it.
+
+```py
+def FractionalKnapsack(items):
+  a = []
+  for item in items
+    a.insert({ item.v / item.w, w })
+  
+  sort_descendingly(a)
+
+  ans = 0
+  for item in a
+    ans += a.value * a.weight
+
+  return ans
+```
+
+## Huffman Codes
+
+The problem of huffman encoding is taking a set of symbols with probabilities and assign codes to each symbol, such that the entropy of the alphabet is minimal.
+
+```py
+def Huffman(C):
+  n = |C|
+  Q = C
+
+  for i in 1:n-1
+    allocate new node z
+    z.left = x = Extract_Min(Q)
+    z.right = y = Extract_Min(Q)
+    z.freq = x.freq + y.freq
+    Q.insert(z)
+
+  return Extract_Min(Q)
+```
