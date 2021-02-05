@@ -4,6 +4,8 @@ This repository is a summary for the course, it will contain my own implementati
 
 # Table of Contents
 
+- [CMP302: Design and Analysis of Algorithms Summary](#cmp302-design-and-analysis-of-algorithms-summary)
+- [Table of Contents](#table-of-contents)
 - [Dynamic Programming](#dynamic-programming)
   - [Conditions for DP solution satisfaction](#conditions-for-dp-solution-satisfaction)
   - [Types of DP solutions](#types-of-dp-solutions)
@@ -11,16 +13,25 @@ This repository is a summary for the course, it will contain my own implementati
   - [Complexity of DP](#complexity-of-dp)
   - [Fibonacci](#fibonacci)
   - [Rod Cutting](#rod-cutting)
+    - [Finding optimal cuts](#finding-optimal-cuts)
   - [Matrix Chain Multiplication](#matrix-chain-multiplication)
+    - [Naive approach](#naive-approach)
+    - [Recursive approach](#recursive-approach)
+    - [Top-down approach](#top-down-approach)
+    - [Bottom-up approach](#bottom-up-approach)
 - [Greedy Algorithms](#greedy-algorithms)
   - [Solution Steps](#solution-steps)
   - [Activity Selection](#activity-selection)
   - [Knapsack Problem](#knapsack-problem)
+    - [0-1 Knapsack](#0-1-knapsack)
+    - [Fractional Knapsack](#fractional-knapsack)
   - [Huffman Codes](#huffman-codes)
-- [Graphs]()
-- [NP Completeness]()
-- [String Matching]()
-- [Appendix]()
+- [Graphs](#graphs)
+  - [Graph Representations](#graph-representations)
+  - [Breadth First Search (BFS)](#breadth-first-search-bfs)
+  - [Depth First Search (DFS)](#depth-first-search-dfs)
+  - [Topological Sort](#topological-sort)
+  - [Strongly Connected Components (SCC)](#strongly-connected-components-scc)
 
 # Dynamic Programming
 
@@ -405,4 +416,152 @@ def Huffman(C):
     Q.insert(z)
 
   return Extract_Min(Q)
+```
+
+# Graphs
+
+## Graph Representations
+
+- Adjacency List
+  - $\Theta(V + E)$ space
+  - Takes less space
+  - Takes more time to check if there is an edge between $u$ and $v$
+- Adjacency Matrix
+  - $\Theta(V^2)$ space
+  - Takes more space
+  - Faster to check if there is an edge between $u$ and $v$
+
+## Breadth First Search (BFS)
+
+- One of the ways to traverse a graph
+- Used for finding unweighted shortest path between a node and all nodes
+- Expands from s to surrounding nodes
+
+![](assets/graphs/bfs.gif)
+
+```py
+def bfs(G, s):
+  for each vertex u in G
+    u.color = white # white: unvisited, gray: current, black: visited
+    u.dist = inf
+    u.parent = nil
+
+  s.color = gray
+  s.dist = 0
+  s.parent = nil
+
+  Q = new queue
+  Q.enqueue(s)
+
+  while Q is not empty
+    u = Q.dequeue()
+    for each v in adj[u]
+      if v.color is white
+        v.color = gray
+        v.dist = u.dist + 1
+        v.parent = u
+        Q.enqueue(v)
+
+    u.color = black
+```
+
+**Runtime:** $O(V + E)$
+
+## Depth First Search (DFS)
+
+- One of the ways to traverse a graph
+- Used as a building block for a lot of algorithms
+
+![](assets/graphs/dfs.gif)
+
+```py
+def dfs(G):
+  for each vertex u in G 
+    u.color = white
+    u.parent = pi
+  time = 0
+  for each vertex u in G
+    if u.color is white
+      dfs_visit(G, u)
+
+def dfs_visit(G, u):
+  time = time + 1
+  u.start = time
+  u.color = gray
+
+  for each vertex v in adj[u]
+    if v.color is white
+      v.parent = u
+      dfs_visit(G, v)
+
+  u.color = black
+  time = time + 1
+  u.finish = time
+```
+
+**Runtime:** $O(V + E)$
+
+## Topological Sort
+
+- Linear ordering of vertices in graph G such that if there exists edge $(u, v)$ then $u$ appears before $v$
+- Must be performed on a DAG (directed acyclic graph)
+
+![](assets/graphs/topological.gif)
+
+```py
+def topo(G):
+  S = new stack
+
+  for each vertex u in G
+    u.color = white
+  
+  for each vertex u in G
+    if u.color is white
+      topo_dfs(G, S, u)
+
+  while S is not empty
+    print(S.pop())
+
+  return S
+
+def topo_dfs(G, S, u):
+  u.color = gray
+
+  for each vertex v in adj[u]
+    if v.color is white
+      topo_dfs(G, Q, u)
+
+  u.color = black
+  S.push(u)
+```
+
+**Runtime:** $O(V + E)$
+
+## Strongly Connected Components (SCC)
+
+- Maximal set of vertices $C$ such that every pair of vertices $u$ and $v$ are reachable from each other ($u \rarr v; v \rarr u$)
+
+![](assets/graphs/scc.gif)
+
+```py
+def scc(G):
+  S = topo(G) # topological order of graph 
+              # order of vertices according ot finish time
+  
+  G_T = transpose(G)
+
+  C = new list
+
+  while S is not empty
+    u = S.pop()
+    if u.color is white
+      c = new list
+      scc_dfs(G, c, u)
+      C.insert(c)
+
+def scc_dfs(G, c, u):
+  c.insert(u)
+  for vertex v in adj[u]
+    if v.color is white
+      dfs_print(G, u)
 ```
