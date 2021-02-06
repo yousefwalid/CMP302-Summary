@@ -32,6 +32,16 @@ This repository is a summary for the course, it will contain my own implementati
   - [Depth First Search (DFS)](#depth-first-search-dfs)
   - [Topological Sort](#topological-sort)
   - [Strongly Connected Components (SCC)](#strongly-connected-components-scc)
+  - [Disjoint Sets Union (DSU)](#disjoint-sets-union-dsu)
+    - [DSU Operations](#dsu-operations)
+    - [DSU Representations](#dsu-representations)
+      - [Linked List representation](#linked-list-representation)
+      - [Tree representation](#tree-representation)
+    - [DSU Applications](#dsu-applications)
+      - [Graph Connected Components](#graph-connected-components)
+  - [Minimum Spanning Tree (MST)](#minimum-spanning-tree-mst)
+    - [Kruskal's algorithm](#kruskals-algorithm)
+    - [Prim's algorithm](#prims-algorithm)
 
 # Dynamic Programming
 
