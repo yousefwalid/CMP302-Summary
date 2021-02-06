@@ -134,7 +134,8 @@ def cut_rod(n, p): # p is array of prices of piece i
   return q
 ```
 
-**Runtime:** $O(2^n)$, we can try to optimize this algorithm using dynamic programming, but first we need to check if a DP approach is applicable, by inspecting the recursion tree:
+- **Runtime:** $O(2^n)$
+  - we can try to optimize this algorithm using dynamic programming, but first we need to check if a DP approach is applicable, by inspecting the recursion tree:
 
 ![](assets/dp/Rod_Cutting_03.png)
 
@@ -157,7 +158,7 @@ def cut_rod(n, p):
   return q
 ```
 
-**Runtime:** $\Theta(n^2)$
+- **Runtime:** $\Theta(n^2)$
 
 *Note the similarities between the memoization solution and the naive solution, they are very similar, the memoization solution is basically the naive solution but with an extra memoization part that checks if a subproblem has been calculated before.*
 
@@ -177,7 +178,7 @@ def cut_rod(n, p):
   return r[n]
 ```
 
-**Runtime:** $\Theta(n^2)$
+- **Runtime:** $\Theta(n^2)$
 
 **Explanation:** $r[0..n]$ is an array containing the optimal answers for all cuts at any given iteration, for each rod length $n$ we can define its optimal answer as $max_{i=0}^{i=n}(p[i] + r[n - i])$. 
 *We attempt cutting a piece of length $i$ and add it to the optimal answer of $n - i$ for all possible $i$.*
@@ -268,7 +269,7 @@ def mat_chain(i, j):
   return q
 ```
 
-**Runtime is exponential**
+- **Runtime is exponential**
 
 ### Top-down approach
 We can take the previous recursive solution and apply **memoization** to it:
@@ -290,7 +291,7 @@ def mat_chain(i, j):
   return memo[i, j]
 ```
 
-**Runtime:** $O(n^3)$
+- **Runtime:** $O(n^3)$
 
 ### Bottom-up approach
 
@@ -323,7 +324,7 @@ def mat_chain():
           s[i, j] = k
   return m[1, n], s
 ```
-**Runtime:** $O(n^3)$
+- **Runtime:** $O(n^3)$
 
 # Greedy Algorithms
 
@@ -362,7 +363,7 @@ def activity_selection():
   return A
 ```
 
-**Runtime:** $O(nlogn)$
+- **Runtime:** $O(nlogn)$
 
 We sort the tasks on finish times, and count the number of non-overlapping tasks from the least finish time up to the largest finish time.
 
@@ -465,7 +466,7 @@ def bfs(G, s):
     u.color = black
 ```
 
-**Runtime:** $O(V + E)$
+- **Runtime:** $O(V + E)$
 
 ## Depth First Search (DFS)
 
@@ -499,7 +500,7 @@ def dfs_visit(G, u):
   u.finish = time
 ```
 
-**Runtime:** $O(V + E)$
+- **Runtime:** $O(V + E)$
 
 ## Topological Sort
 
@@ -535,7 +536,7 @@ def topo_dfs(G, S, u):
   S.push(u)
 ```
 
-**Runtime:** $O(V + E)$
+- **Runtime:** $O(V + E)$
 
 ## Strongly Connected Components (SCC)
 
@@ -565,3 +566,127 @@ def scc_dfs(G, c, u):
     if v.color is white
       dfs_print(G, u)
 ```
+
+## Disjoint Sets Union (DSU)
+
+- Each set has one representative (member of the same set)
+- Used to identify whether two members belong to the same set or not
+
+### DSU Operations
+  1. $make\_set(x)$: creates a new set with only $x$ as a member.
+  2. $union(x, y)$: unites sets containing $x$ and $y$.
+  3. $find\_set(x)$: returns the representative of the set containing $x$.
+
+### DSU Representations
+
+#### Linked List representation
+- Each set is a separate linked list
+
+![](assets/graphs/dsu/dsu_01.png)
+
+Operations:
+1. $make\_set(x)$ creates a new list with $x$ in it. $O(1)$
+2. $union(x,y)$ just join two ends of the linked lists, however we need to loop through elements of one list and update their pointers one by one. $O(n)$
+3. $find\_set(x)$ returns the pointer to the set object the element is pointing at. $O(1)$
+
+- To create components for a graph with $n$ connected vertices $\rarr$ $\Theta(n^2)$
+  - Weight Union: can try to append shorter list to the longer one $\rarr$ $O(m + nlgn)$ for $m$ DSU operations $n$ of which are $make\_set$ operations. 
+
+#### Tree representation
+
+- Each set is a separate tree
+
+![](assets/graphs/dsu/dsu_02.png)
+
+Operations:
+1. $make\_set(x)$ creates a new tree with $x$ in it. $O(1)$
+2. $union(x, y)$ one tree's root points to the other tree's root. $O(n)$
+3. $find\_set(x)$ traverse the tree up. $O(n)$
+
+If tree representation has worse complexity than linked list, why use it at all? heuristics!
+
+- Heuristics:
+  1. Union By Rank: union the smaller set to the larger set. $O(mlgn)$
+  2. Path Compression: while traversing in $find\_set(x)$ can update the parent of bottom childs to the root of the tree, significantly decreasing tree height.
+       - Union by rank + Path compression $\rarr$ $O(m\ \alpha(n))$
+
+### DSU Applications
+
+#### Graph Connected Components
+
+- DSU can be used to find the connected components of a graph.
+- Done by adding all vertices with edges between them to the same set.
+
+```py
+# Turns a graph into sets of connected components
+def connect_components(G):
+  for each vertex v in G
+    make_set(v)
+  
+  for each edge (u, v) in G
+    if find_set(u) != find_set(v)
+      union(u, v)
+
+def same_component(u, v):
+  if find_set(u) == find_set(v)
+    return true
+  return false
+```
+
+## Minimum Spanning Tree (MST)
+- Problem of transforming a graph into a tree with minimum summation of edge weights. $min[w(T) = \sum_{(u,v)\epsilon T} w(u,v)]$
+- Used in reducing cost of components
+  - i.e. wiring electronics components, building city roads, etc..
+- Approach the problem in a greedy way.
+
+### Kruskal's algorithm
+
+- Main idea is to sort the edges in a non-decreasing order based on their weights.
+- Pick edges with minimum weights to connect all vertices.
+
+![](assets/graphs/kruskal.gif)
+
+```py
+def kruskal(G):
+  A = new set
+
+  for each vertex in v
+    make_set(v)
+  
+  sort G.edges in non decreasing order according to weights
+
+  for each edge e == (u, v) in non decreasing order of weights
+    if find_set(u) != find_set(v)
+      A.insert(e)
+      union(u, v)
+
+  return A
+```
+- **Runtime:** $O(E\ lgE) = O(E\ lgV^2) = O(E\ lgV)$
+
+### Prim's algorithm
+- Similar idea to Kruskal but works on vertices instead of edges.
+- Start with a one node tree and check the minimum edge connected to the tree, take it and expand.
+
+![](assets/graphs/prim.gif)
+
+```py
+def prim(G, r): # r is root
+  for each vertex u in G
+    u.key = inf
+    u.par = nil
+  
+  r.key = 0
+
+  Q = new min_heap
+  
+  while Q is not empty
+    u = Q.extract_min
+    for each vertex v in adj[u]
+      if v in Q and w(u, v) < v.key
+        v.par = u
+        v.key = w(u, v) # also updates heap
+```
+
+- **Runtime:** $O(V\ lgV + E\ lgV) = O(E\ lgV)$
+  - Using fibonacci heap: $O(E + V\ lgV)$

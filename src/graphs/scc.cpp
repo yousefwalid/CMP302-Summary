@@ -1,16 +1,6 @@
 #include <bits/stdc++.h>
 #include "topological_sort.hpp"
-
-std::vector<std::vector<int>> __transpose_G(const std::vector<std::vector<int>> &adj)
-{
-  std::vector<std::vector<int>> adj_T(adj.size());
-
-  for (int i = 0; i < adj.size(); i++)
-    for (auto v : adj[i])
-      adj_T[v].push_back(i);
-
-  return adj_T;
-}
+#include "util.hpp"
 
 void __scc_dfs(int u, const std::vector<std::vector<int>> &adj, std::vector<bool> &visited, std::vector<int> &c)
 {
