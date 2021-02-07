@@ -42,6 +42,17 @@ This repository is a summary for the course, it will contain my own implementati
   - [Minimum Spanning Tree (MST)](#minimum-spanning-tree-mst)
     - [Kruskal's algorithm](#kruskals-algorithm)
     - [Prim's algorithm](#prims-algorithm)
+  - [Shortest Paths](#shortest-paths)
+    - [Single Source Shortest Paths](#single-source-shortest-paths)
+      - [Bellman Ford](#bellman-ford)
+      - [Directed Acyclic Graph (DAG) shortest-path](#directed-acyclic-graph-dag-shortest-path)
+      - [Djikstra](#djikstra)
+    - [All-pairs shortest paths](#all-pairs-shortest-paths)
+      - [Dynamic Programming shortest paths](#dynamic-programming-shortest-paths)
+      - [Floyd-Warshall algorithm](#floyd-warshall-algorithm)
+      - [Applications on all-pairs shortest paths](#applications-on-all-pairs-shortest-paths)
+        - [Transitive closure](#transitive-closure)
+        - [Johnson's algorithm](#johnsons-algorithm)
 
 # Dynamic Programming
 
@@ -672,7 +683,7 @@ def kruskal(G):
 
   return A
 ```
-- **Runtime:** $O(E\ lgE) = O(E\ lgV^2) = O(E\ lgV)$
+- **Runtime:** $O(E\ logE) = O(E\ logV^2) = O(E\ logV)$
 
 ### Prim's algorithm
 - Similar idea to Kruskal but works on vertices instead of edges.
@@ -698,5 +709,307 @@ def prim(G, r): # r is root
         v.key = w(u, v) # also updates heap
 ```
 
-- **Runtime:** $O(V\ lgV + E\ lgV) = O(E\ lgV)$
-  - Using fibonacci heap: $O(E + V\ lgV)$
+- **Runtime:** $O(V\ logV + E\ logV) = O(E\ logV)$
+  - Using fibonacci heap: $O(E + V\ logV)$
+
+
+## Shortest Paths
+All shortest paths algorithms utilize the optimal substructure of the shortest paths problem, that is: The path required to go from vertex $v_0$ to $v_k$ can be decomposed to a summation of different shortest subpaths.
+
+- Types of shortest paths problems:
+  - Single-source shortest path problem
+    - Can be solved directly using defined algorithms.
+  - Single-pair shortest path problem
+    - Can be solved by finding all shortest paths and then taking the pair we want only.
+  - Single-destination shortest path problem
+    - Reverse edges of graph and solve a single-source problem using the destination as the source.
+  - All-source shortest paths
+    - Use specialized algorithms instead of doing $n$ iterations of single-source runs.
+
+- Negative edge weights
+  - Some algorithms allow them, some do not.
+
+- How algorithms handle different cycles:
+
+  - ![](assets/graphs/shortest-paths/cycles.png)
+
+  - Negative-weight cycles (summation of cycle is negative): 
+    - Either prohibited or detected
+  - Positive-weight cycles (summation of cycle is positive):
+    - Theoretically not possible
+  - Zero-weight cycles:
+    - Eliminated from the path
+
+### Single Source Shortest Paths
+
+
+#### Bellman Ford
+
+- Single source, all destination
+- Allows negative edges
+- Does not allow negative cycles but it detects them.
+
+1. Iterate over all edges $(u, v)$ and relax them.
+    - If the order of iteration is correct, we will have the shortest path now, however we cannot guarantee that the order of iteration is correct.
+2. Repeat $d$ times where $d$ is the length of the longest path between the source and the destination.
+    - Repetition is required to guarantee that we will ignore the order of iteration.
+
+![](assets/graphs/ford.gif)
+
+```py
+def ford(G, s):
+  # initialization
+  for each vertex v in G
+    v.dist = inf
+    v.parent = nil
+  s.d = 0
+
+  # length of longest possible path
+  for i in 1:|G.V|-1 
+    for each edge e == (u, v) in G
+      if u.dist + e.weight < v.dist
+        v.dist = u.dist + e.weight
+        v.par = u
+  
+  # check for negative cycles
+  for each edge e == (u, v) in G 
+    if v.dist > u.dist + e.weight
+      return false
+  
+  return true
+```
+
+- **Runtime:** $O(VE)$
+
+#### Directed Acyclic Graph (DAG) shortest-path
+
+Since it is a DAG, we can topologically sort the graph and find the correct ordering.
+
+- Single source, all destination
+- Allows negative edges
+- Negative cycles will not exist since it is a DAG.
+
+1. Topologically sort the graph
+2. Relax edges in the topological order
+
+*This is similar to Bellman Ford except that it knows the correct ordering of vertices*
+
+![](graphs/../assets/graphs/shortest-paths/dag.png)
+
+```py
+def DAG_shortest(G, s):
+  topological_sort(G)
+
+  # initialization
+  for each vertex v in G
+    v.dist = inf
+    v.parent = nil
+  s.d = 0
+
+  # iterate over topologically sorted graph and relax all edges
+  for each vertex u in topologically ordered graph G
+    for each edge e == (u, v) in adj[u]
+        if u.dist + e.weight < v.dist
+          v.dist = u.dist + e.weight
+          v.par = u
+```
+
+- **Runtime:** $O(V + E)$
+
+#### Djikstra
+
+- Single source, multiple destination.
+- Does not allow negative edges.
+- Does not allow negative cycles but allows positive ones.
+
+*BFS is a special case of Djikstra when edges have same weight*
+
+![](assets/graphs/djikstra.gif)
+
+```py
+def djikstra(G, s):
+  Q = new min heap sorting vertices by weights
+  Q.insert(s)
+  while Q is not empty
+    u = Q.pop()
+    for each edge e == (u, v) in adj[u]
+      if u.dist + e.weight < v.dist
+        v.dist = u.dist + e.weight # updates min heap
+```
+
+- **Runtime:** 
+  - Min-heap: $O(E\ logV)$
+  - Fibonacci heap: $O(V\ logV + E)$
+  - Array: $O(V^2)$
+
+### All-pairs shortest paths
+
+In all-pairs shortest paths we take an input $G(V, E)$ with weighted edges and we are required to compute an output $n\times n$ matrix $W$ of shortest paths $\delta(u, v)$ for all $u, v$.
+
+We can run single source algorithms for all vertices $v$ to find all shortest paths between all pairs of vertices.
+
+Let's see how the complexity will be:
+  - Bellman Ford: $O(V^2 E)$ or $O(V^4)$ if the graph is dense
+  - Djikstra:
+    - Min-heap: $O(VE\ logV)$
+    - Fibonacci heap: $O(V^2\ logV + VE)$
+    - Array: $O(V^3)$
+
+Really costly, we can do better.
+
+#### Dynamic Programming shortest paths
+
+Thinking in a bottom-up way we can:
+1. Compute shortest path (SP) for all pairs with length one
+2. Use the previously computed SP of length one to expand and compute length two.
+3. Repeat for longer lengths.
+
+This way is $O(n^4)$, we can optimize a bit as we can notice that there is an analogy between **fast exponentiation** and this algorithm.
+
+Since 
+$L^{(1)} = L^{(0)} . W = W$
+$L^{(2)} = L^{(1)} . W = W^2$
+$...$
+$L^{(n)} = L^{(n-1)} . W = W^n$
+
+we can compute this in $O(n^3logn)$ instead.
+
+```py
+def extend_shortest_path(G, L, W):
+  n = L.rows
+  let L' = new matrix[n][n]
+  for i in 1:n
+    for j in 1:n
+      L[i][j] = inf
+      for k in 1:n 
+        L[i][j] = min(L[i][j], L[i][k] + W[k][j])
+  return L
+
+def all_pairs_shortest_path(G, W):
+  n = W.rows
+  L = new list of n*n matrices
+  L[1] = W
+  m = 1
+
+  while m < n-1
+    L[2*m] = extend_shortest_path(L[m], L[m])
+    m = 2*m
+
+  return L[m]  
+```
+
+- **Runtime:** $\Theta(n^3 logn) = \Theta(V^3 logV)$
+
+Transforming the same logic to a top-down way we notice:
+- Shortest path from $i \rarr j$ can be written as $SP(i \rarr k) + SP(k \rarr j)$
+- Divide and conquer approach
+  - $l_{ij}^{(m)} = min_{i \leq k \leq n}\{l_{ik}^{m-1} + w_{kj}\}$
+
+
+#### Floyd-Warshall algorithm
+
+- Uses the same approach as the dynamic programming approach but on vertices rather than edges.
+- Negative edges allowed
+- Negative cycles are not allowed
+
+![](assets/graphs/shortest-paths/floyd.png)
+
+```py
+def floyd(W):
+  n = W.rows
+  D = W
+
+  for k in 1:n
+    for j in 1:n
+      for i in 1:n
+        D[i][j] = min(D[i][j], D[i][k] + D[k][j])
+```
+- **Runtime:** $\Theta(n^3) = \Theta(V^3)$
+
+*Implementation can include a parent matrix to know the exact path.*
+
+#### Applications on all-pairs shortest paths
+
+##### Transitive closure
+
+Given a graph $G(V, E)$ we need to know if there exists an edge between all vertex pairs $u$, $v$.
+
+1. Assign weights 1 to each edge in $E$.
+2. Run Floyd-Warshall.
+3. If $d_{ij} < n$ then $i$ and $j$ are connected, otherwise $d_{ij} = \infty$ therefore not connected.
+
+```py
+def transitive_closure(G):
+  n = |G.V|
+  T = new n*n matrix
+
+  # build transitive closure graph
+  for i in 1:n
+    for j in 1:n
+      if i == j or (i, j) exists in G.E
+        T[i][j] = 1
+      else
+        T[i][j] = 0
+
+  for k in 1:n
+    for i in 1:n
+      for j in 1:n
+        T[i][j] = T[i][j] or (T[i][k] and T[k][j])
+```
+
+##### Johnson's algorithm
+
+- Used in sparse graphs $(E \ll V^2)$
+
+It goes as follows
+
+- If no negative edges
+  - Apply Djikstra with fibonacci heap in $O(V^2logV + VE)$
+  - Better than Floyd-Warshall
+- Else if no negative-weight cycles
+  - Compute new set of non-negative edge weights that allow us to use same method
+  - New edge weights $\hat w$ must satisfy
+    - $\hat w$ is nonnegative
+    - Path $p$ is a shortest path from $u$ to $v$ in $w$ if and only if it is also a shortest path in $\hat w$
+
+So we conclude that we need to use Djikstra but we need to solve the problem of negative weights, to do that we change the edges from $w$ to $\hat w$ using the following mapping 
+$$\hat w(u,v) = w(u,v) + h(u) - h(v)$$ 
+$h(x)$ is a weight assigned to each vertex.
+
+- How to calculate the weights $h(x)$ of all nodes?
+
+  1. Add a new vertex $u$ to the graph
+  2. Connect $u$ to all other vertices using edges of weight $0$
+  3. Run Bellman Ford on the modified graph
+  4. The distance from vertex $u$ to a vertex $v$ is $h(v)$: the weight that is supposed to be added to node $v$
+  5. Compute $\hat w$ using the computed weights and run djikstra as supposed.
+  6. Subtract the values $h(u), h(v)$ added previously.
+
+```py
+def johnson(G):
+  G' = new graph 
+  G' = G
+  insert new vertex s in G'
+  for all vertices v in G
+    insert new edge e == (s,v) with weight 0 to graph G'
+
+  if bellman_ford(G', s) == false
+    throw("Negative edges")
+  else
+    for each vertex v in G'
+      v.hval = D[s][v] # D is the weights calculated by Bellman-Ford
+
+    for each edge e == (u, v) in G'
+      e.weight = e.weight + u.hval - v.hval
+
+    D = new n*n matrix
+
+    for each vertex u in G
+      d = djikstra(G', u) # weights computed by djikstra
+
+      for each vertex v in G
+        D[u][v] = d[u][v] - (u.hval - v.hval) # assign the djikstra weight and remove the hval added
+
+  return D
+```
+
