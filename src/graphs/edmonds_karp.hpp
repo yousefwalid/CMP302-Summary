@@ -44,7 +44,7 @@ int edmonds_karp(int s, int t, const vector<vector<pair<int, int>>> &adj)
 {
   int flow = 0, new_flow, n = adj.size();
   vector<int> par(n);
-  vector<vector<int>> capacity(n, vector<int>(n));
+  vector<vector<int>> capacity(n, vector<int>(n, 0));
 
   for (int u = 0; u < n; u++)
     for (auto &e : adj[u])
