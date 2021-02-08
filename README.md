@@ -53,6 +53,15 @@ This repository is a summary for the course, it will contain my own implementati
       - [Applications on all-pairs shortest paths](#applications-on-all-pairs-shortest-paths)
         - [Transitive closure](#transitive-closure)
         - [Johnson's algorithm](#johnsons-algorithm)
+  - [Maximum Flow Problem](#maximum-flow-problem)
+    - [Modelling different graphs to a flow network](#modelling-different-graphs-to-a-flow-network)
+    - [Flow Networks definitions](#flow-networks-definitions)
+      - [Residual networks](#residual-networks)
+      - [Augmenting paths](#augmenting-paths)
+      - [Cuts of flow networks](#cuts-of-flow-networks)
+      - [Max-flow min-cut](#max-flow-min-cut)
+    - [Ford-Fulkerson algorithm](#ford-fulkerson-algorithm)
+    - [Edmonds-Karp algorithm](#edmonds-karp-algorithm)
 
 # Dynamic Programming
 
