@@ -754,10 +754,10 @@ All shortest paths algorithms utilize the optimal substructure of the shortest p
 2. Repeat $d$ times where $d$ is the length of the longest path between the source and the destination.
     - Repetition is required to guarantee that we will ignore the order of iteration.
 
-![](assets/graphs/ford.gif)
+![](assets/graphs/bellman_ford.gif)
 
 ```py
-def ford(G, s):
+def bellman_ford(G, s):
   # initialization
   for each vertex v in G
     v.dist = inf
@@ -913,7 +913,7 @@ Transforming the same logic to a top-down way we notice:
 - Negative cycles are not allowed
 
 ![](assets/graphs/shortest-paths/floyd.png)
-
+![](assets/graphs/floyd_warshall.png)
 ```py
 def floyd(W):
   n = W.rows
@@ -1013,3 +1013,95 @@ def johnson(G):
   return D
 ```
 
+## Maximum Flow Problem
+
+Maximum flow problem applies to a graph $G(V,E)$ called a **flow network** which has
+- One vertex labeled as a source
+  - This node has an indegree of zero
+- One vertex labeled as a sink
+  - This node has an outdegree of zero
+- An edge $(u,v)$ represents a pipe which has a maximum flow capacity of $c(u,v)$
+- Each edge $(u,v)$ has nonnegative capacity $c(u,v)>0$
+- If there exists an edge $(u,v)$ then there is no edge in reverse direction $(v,u)$
+- No self loops
+
+The problem is to find the maximum flow that goes from source $s$ to sink $t$.
+
+![](assets/graphs/max_flow/graph.png)
+
+**Flow** is a real valued function $f:V\times V \rarr \R$ that satisfies:
+  - Capacity constraint
+    - for all $u,v\ \epsilon\ E$, $0 \leq f(u,v) \leq c(u,v)$
+  - Flow constraint
+    - for all $u,v\ \epsilon\ V - \{s,t\}$, for each $u$
+      - $\sum_{v\epsilon V} f(v,u) = \sum_{v\epsilon V} f(u,v)$
+
+### Modelling different graphs to a flow network
+
+1. Antiparallel edges
+     - $(u,v)$ and $(v,u)$ are antiparallel edges
+       - ![](assets/graphs/max_flow/antiparallel_01.png)
+     - Split one of the edges to a new vertex 
+       - ![](assets/graphs/max_flow/antiparallel_02.png)
+2. Multiple sources/sinks
+    - Add a new vertices as source and sink and connect them to all source nodes and sink nodes with edges of capacity $\infty$
+      - ![](assets/graphs/max_flow/multi_source_sink.png)
+
+### Flow Networks definitions
+#### Residual networks
+
+- Residual network $G_f$ is similar to flow networks, except it allows for reversed edges
+- Whenever we change flow of an edge $(u,v)$ in the flow network
+  - Subtract the flow of that edge $f(u,v)$ from the capacity $c(u,v)$ in the residual network
+  - Add a new edge $(v,u)$ with the flow $f(u,v)$
+
+#### Augmenting paths
+
+- Augmenting path $p$ is a simple path (all vertices on path are distinct) from $s$ to $t$ in the residual network.
+
+#### Cuts of flow networks
+
+- A cut $(S,T)$ of a flow network $G(V,E)$ is a partition $V$ into two distinct sets $S$ and $T$ 
+- **Net flow** $f(S,T)$ across the cut $(S,T)$ is difference of flow between nodes in $T$ and nodes in $S$
+- **Capacity of cut** $(S,T)$ is the summation of capacities on the edges which we cut at.
+- A **minimum cut** of a network is the cut with the minimum capacity.
+
+#### Max-flow min-cut
+
+- The value of the max-flow $f$ of a network is equal to the minimum cut of the same network.
+- The residual network $G_f$ contains no augmenting paths.
+
+
+### Ford-Fulkerson algorithm
+
+1. Iterate over all paths possible in residual network Gf
+2. While there is a path, find the minimum capacity p_flow along that path
+3. Iterate over all edges on that path
+    - If the edge is a forward edge, add p_flow to its flow
+    - If the edge is a backward edge, subtract p_flow from its flow 
+
+```py
+def ford_fulkerson(G, s, t):
+  for each edge e == (u, v) in G:
+    e.flow = 0
+
+  Gf = G # residual network
+
+  while there exists a path p from s to t in Gf
+    p_flow = min(capacity of edges on path p)
+    for each edge e == (u, v) in p
+      if (u, v) in G.E # it is a forward edge
+        (u, v).flow = (u, v).flow + p_flow
+      else # reverse edge 
+        (v, u).flow = (v, u).flow - p_flow
+```
+
+- **Runtime:** $O(E|f^*|)$, where $f^*$ is the maximum flow.
+    - Runtime is really slow for networks with high flow!
+      -  ![](assets/graphs/max_flow/ffa_slow.png)
+
+### Edmonds-Karp algorithm
+
+- Uses BFS for augmenting path (shortest path)
+- Total number of flow augmentation is $O(VE)$, 
+- **Runtime:** $O(VE^2)$
