@@ -1110,6 +1110,8 @@ def ford_fulkerson(G, s, t):
 - **Runtime:** $O(E|f^*|)$, where $f^*$ is the maximum flow.
     - Runtime is really slow for networks with high flow!
       -  ![](assets/graphs/max_flow/ffa_slow.png)
+      -  Results in $1000000$ iterations.
+      -  Can use BFS to ignore the low weighted edge.
 
 ### Edmonds-Karp algorithm
 
