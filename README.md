@@ -1089,6 +1089,8 @@ The problem is to find the maximum flow that goes from source $s$ to sink $t$.
     - If the edge is a forward edge, add p_flow to its flow
     - If the edge is a backward edge, subtract p_flow from its flow 
 
+![](assets/graphs/ford_fulkerson.gif)
+
 ```py
 def ford_fulkerson(G, s, t):
   for each edge e == (u, v) in G:
