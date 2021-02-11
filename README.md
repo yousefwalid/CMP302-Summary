@@ -62,6 +62,16 @@ This repository is a summary for the course, it will contain my own implementati
       - [Max-flow min-cut](#max-flow-min-cut)
     - [Ford-Fulkerson algorithm](#ford-fulkerson-algorithm)
     - [Edmonds-Karp algorithm](#edmonds-karp-algorithm)
+- [NP Completeness](#np-completeness)
+  - [Complexity classes](#complexity-classes)
+    - [P vs NP](#p-vs-np)
+  - [Decision vs Optimization](#decision-vs-optimization)
+  - [Reduction](#reduction)
+    - [Reducible problems](#reducible-problems)
+    - [3-CNF-SAT $\rarr$ Clique](#3-cnf-sat-rarr-clique)
+    - [Clique $\rarr$ Vertex-cover](#clique-rarr-vertex-cover)
+    - [Hamiltonian Cycle $\rarr$ TSP](#hamiltonian-cycle-rarr-tsp)
+    - [3-CNF-SAT $\rarr$ Subset Sum](#3-cnf-sat-rarr-subset-sum)
 
 # Dynamic Programming
 
@@ -1118,3 +1128,159 @@ def ford_fulkerson(G, s, t):
 - Uses BFS for augmenting path (shortest path)
 - Total number of flow augmentation is $O(VE)$, 
 - **Runtime:** $O(VE^2)$
+
+# NP Completeness
+
+## Complexity classes
+- P: Problems that can be solved in **polynomial** time.
+- NP (Non-determinstic Polynomial time): Problems which their solutions can be **verified** in **polynomial** time.
+  - The problem solution itself can be polynomial or non-polynomial
+- NP-hard: Problems which are **at least as hard as** the hardest problems in NP.
+- NP-complete: Decision problems which contain **the hardest problems** in NP.
+  - Hard problems, probably non-polynomial, but their solutions can still be verified in polynomill time.
+  - To prove a problem is NP-complete, we need to prove that is NP and NP-hard
+    - Can achieve proof of NP by checking if validation of a solution is polynomial.
+    - Can achieve proof of NP-hard by reduction of a hard problem to the unknown one.
+
+![](assets/np-completeness/complexity_classes.png)
+
+Problems in NP-complete class are interesting, because if we proved that $P=NP$, we will solve a wide array of problems.
+
+### P vs NP
+Very similar problems but P vs NP:
+  - Shortest (P) vs Longest (NP) simple paths
+  - Euler tour (P) vs Hamiltonian cycle (NP)
+  - 2-CNF satisfiability (P) vs 3-CNF satisfiability (NP)
+
+## Decision vs Optimization
+- Optimization problem: solution achieves **min/max**.
+- Decision problem: solution is **yes** or **no**.
+  
+If an optimization problem is easy, the related decision problem is easy as well.
+If the decision problem is hard, the optimization problem is hard as well.
+
+
+## Reduction
+
+Given two problems $X$ and $A$, and if we know that $X$ is hard.
+
+If we can find a reduction (mapping) from $X$ to $A$ that can be done **in polynomial time**:
+  - $A$ must be as hard as $X$.
+  - If we can solve $A$, then we can solve $X$ in the same time as $A$.
+
+So we can deduce that solving one $NP$ problem will lead us to solving all other $NP$ problems through reductions.
+
+*Note: We always reduce a **hard problem** into an **unknown one**, not the other way around.*
+
+![](assets/np-completeness/reduction.png)
+
+### Reducible problems
+
+<img src="assets/np-completeness/reducible_problems.png" width=50%> </img>
+![]()
+
+1. Circuit-SAT
+   - Given a logic circuit, find an input sequence that satisfies that circuit
+
+   - ![](assets/np-completeness/circuit_sat.png)
+
+1.  SAT
+    - Given a boolean expression, find an input sequence that satisfies that expression
+    - $\phi = ((x_1 \rarr x_2) \lor \lnot((\lnot x_1 \lrarr x_3) \lor x_4)) \land \lnot x_2$
+
+
+3. 3-CNF-SAT
+
+     - Given a trinomial POS (product of sums) expression, find an input sequence that satisfies that expression.
+     - $\phi = (x_1 \lor \lnot x_1 \lor \lnot x_2) \land (x_3 \lor x_2 \lor x_4) \land (\lnot x_1 \lor \lnot x_3 \lor \lnot x_4)$
+
+4. Subset-sum
+    - Given a positive numbers set, take a subset of that set to evaluate to a sum $t$.
+      - $S = \{1, 2, 7, 14, 49\},\ t=57$
+
+5. Clique
+    - Given a graph $G(V,E)$, find the maximal subgraph $G'(V,E)$ such that all nodes in $G'$ are pairwise connected.
+    - ![](assets/np-completeness/clique.png)
+  
+6. Vertex-cover
+    - Given a graph $G(V,E)$, find **minimal** subset of vertices $V'$ such that all edges in $G$ are covered (connected) with vertices of $V'$
+    - ![](assets/np-completeness/vertex_cover.png)
+
+7. Hamiltonian cycle
+    - Given a graph $G(V,E)$, check if there exists a cycle in the graph that contains all vertices $V$
+    - <img src="assets/np-completeness/hamiltonian.png" width=50%></img>
+
+8. Travelling Salesman Problem (TSP)
+    - Given a graph $G(V,E)$, find the minimum cost to traverse a graph passing by all the vertices and then going back to the starting vertex.
+    - <img src="assets/np-completeness/tsp.png" width=30%></img>
+
+### 3-CNF-SAT $\rarr$ Clique
+
+- We can reduce 3-CNF-SAT to Clique, this will prove that Clique problem is NP-Complete because we know that 3-CNF-SAT is NP-Complete.
+- We can deduce that Clique problem is as hard as 3-CNF-SAT, because we can find 3-CNF-SAT inside clique.
+
+**Reduction:**
+1. Convert each clause in the 3-CNF-SAT to a set of 3 vertices.
+2. Each vertex represents a variable in that clause.
+3. Connect each vertex $u$ of a clause to all other vertices in other clauses that are not $\lnot u$.
+4. Solve the clique problem on that graph.
+5. The vertices included in the clique are the inputs that satisfy the expression.
+
+*The expression $(x_1 \lor \lnot x_2 \lor \lnot x_3 ) \land (\lnot x_1 \lor x_2 \lor x_3) \land (x_1 \lor x_2 \lor x_3)$ corresponds to the following graph*
+
+![](assets/np-completeness/3-sat_clique.png)
+
+
+### Clique $\rarr$ Vertex-cover 
+
+**Reduction:**
+1. Given a graph $G(V,E)$, find graph $G'(V,E)$ such that if edge $(u,v)$ exists in $G$, it will not exist in $G'$, and vice versa.
+2. Find vertex-cover of $G'(V,E)$ to get set of vertices $V'$ that is the solution to the vertex-cover problem.
+3. The clique of $G(V,E)$ is $V - V'$, that is all the vertices in $G$ except the ones in $V'$
+
+![](assets/np-completeness/clique_vertex-cover.png)
+
+*The vertex cover of graph $(b)$ is $\{w, z\}$ so the clique of graph $(a)$ is $\{u,v,w,x,y,z\} - \{w, z\} = \{u,v,x,y\}$*
+
+### Hamiltonian Cycle $\rarr$ TSP
+
+**Reduction:**
+1. Given an unweighted graph $G(V,E)$, find weighted graph $G'(V,E)$ such that:
+     - If edge $(u,v)$ exists in $G$, it exists in $G'$ with weight $0$
+     - Else, it exists in $G'$ with weight $1$.
+2. Solve TSP on graph $G'(V,E)$
+3. If the solution of TSP on that graph is $0$, then there exists a hamiltonian cycle and the cycle itself is the same of the TSP path.
+
+![](assets/np-completeness/ham_tsp.png)
+
+### 3-CNF-SAT $\rarr$ Subset Sum
+
+**Reduction:**
+1. Create a table with $(\text{number of variables} + \text{number of clauses}) * 2$ rows and $\text{number of variables} + \text{number of clauses}$ columns
+2. For each variable $x_i$ in the 3-CNF-SAT:
+    1. create a column for $x_i$.
+    2. create two rows $v_i$ and $v_i'$.
+3. For each clause $c_i$ in the 3-CNF-SAT:
+    1. create a column for $c_i$.
+    2. create two rows $s_i$ and $s_i'$.
+4. Fill cells of $(v_i, x_i)$ and $(v_i', x_i)$ with 1's, and the rest is 0's
+5. Fill cells of $(v_i, c_i)$ with
+    - 1's if $x_i$ appears in $c_i$
+    - 0's if $x_i$ does not appear in $c_i$
+6. Fill cells of $v_i'$ with inverse of $v_i$
+    - 0 if $v_i$ is 1
+    - 1 if $v_i$ is 0
+7. Fill cell $(s_i, c_i)$ with 1, and 0's for rest
+8. Fill cell $(s_i', c_i)$ with 2, and 0's for rest
+9. Looking at each row as a 10-base number, try to find subset-sum of these numbers that can sum up to $t = 1111..4444..$ where there are number of variables $|X|$ 1's and number of clauses $|C|$ 4's
+10. The subset-sum of those numbers (rows) is the input solution to the 3-CNF-SAT
+
+<img src="assets/np-completeness/3-sat_subset-sum.png" width=70%></img>
+
+*Table corresponding to* $$\phi = 
+C_1 \land C_2 \land C_3 \land C_4 = 
+(x_1 \lor \lnot x_2 \lor \lnot x_3) \land 
+(\lnot x_1 \lor \lnot x_2 \lor \lnot x_3) \land 
+(\lnot x_1 \lor \lnot x_2 \lor x_3) \land 
+(x_1 \lor x_2 \lor x_3)$$
+*Try to find subset-sum from the set $\{1001001, 1000110, 100001, 101110, 10011, 11100, 1000, 2000, 100, 200, 10, 20, 1, 2\}$ with $t=1114444$*
