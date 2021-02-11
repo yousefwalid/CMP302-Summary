@@ -68,10 +68,10 @@ This repository is a summary for the course, it will contain my own implementati
   - [Decision vs Optimization](#decision-vs-optimization)
   - [Reduction](#reduction)
     - [Reducible problems](#reducible-problems)
-    - [3-CNF-SAT $\rarr$ Clique](#3-cnf-sat-rarr-clique)
-    - [Clique $\rarr$ Vertex-cover](#clique-rarr-vertex-cover)
-    - [Hamiltonian Cycle $\rarr$ TSP](#hamiltonian-cycle-rarr-tsp)
-    - [3-CNF-SAT $\rarr$ Subset Sum](#3-cnf-sat-rarr-subset-sum)
+    - [3-CNF-SAT to Clique](#3-cnf-sat-to-clique)
+    - [Clique to Vertex-cover](#clique-to-vertex-cover)
+    - [Hamiltonian Cycle to TSP](#hamiltonian-cycle-to-tsp)
+    - [3-CNF-SAT to Subset Sum](#3-cnf-sat-to-subset-sum)
 
 # Dynamic Programming
 
@@ -1214,7 +1214,7 @@ So we can deduce that solving one $NP$ problem will lead us to solving all other
     - Given a graph $G(V,E)$, find the minimum cost to traverse a graph passing by all the vertices and then going back to the starting vertex.
     - <img src="assets/np-completeness/tsp.png" width=30%></img>
 
-### 3-CNF-SAT $\rarr$ Clique
+### 3-CNF-SAT to Clique
 
 - We can reduce 3-CNF-SAT to Clique, this will prove that Clique problem is NP-Complete because we know that 3-CNF-SAT is NP-Complete.
 - We can deduce that Clique problem is as hard as 3-CNF-SAT, because we can find 3-CNF-SAT inside clique.
@@ -1231,7 +1231,7 @@ So we can deduce that solving one $NP$ problem will lead us to solving all other
 ![](assets/np-completeness/3-sat_clique.png)
 
 
-### Clique $\rarr$ Vertex-cover 
+### Clique to Vertex-cover 
 
 **Reduction:**
 1. Given a graph $G(V,E)$, find graph $G'(V,E)$ such that if edge $(u,v)$ exists in $G$, it will not exist in $G'$, and vice versa.
@@ -1242,7 +1242,7 @@ So we can deduce that solving one $NP$ problem will lead us to solving all other
 
 *The vertex cover of graph $(b)$ is $\{w, z\}$ so the clique of graph $(a)$ is $\{u,v,w,x,y,z\} - \{w, z\} = \{u,v,x,y\}$*
 
-### Hamiltonian Cycle $\rarr$ TSP
+### Hamiltonian Cycle to TSP
 
 **Reduction:**
 1. Given an unweighted graph $G(V,E)$, find weighted graph $G'(V,E)$ such that:
@@ -1253,7 +1253,7 @@ So we can deduce that solving one $NP$ problem will lead us to solving all other
 
 ![](assets/np-completeness/ham_tsp.png)
 
-### 3-CNF-SAT $\rarr$ Subset Sum
+### 3-CNF-SAT to Subset Sum
 
 **Reduction:**
 1. Create a table with $(\text{number of variables} + \text{number of clauses}) * 2$ rows and $\text{number of variables} + \text{number of clauses}$ columns
