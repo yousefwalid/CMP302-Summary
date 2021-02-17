@@ -72,6 +72,11 @@ This repository is a summary for the course, it will contain my own implementati
     - [Clique to Vertex-cover](#clique-to-vertex-cover)
     - [Hamiltonian Cycle to TSP](#hamiltonian-cycle-to-tsp)
     - [3-CNF-SAT to Subset Sum](#3-cnf-sat-to-subset-sum)
+- [String Matching](#string-matching)
+  - [Naive Approach](#naive-approach-1)
+  - [Rabin-Karp](#rabin-karp)
+  - [Finite Automata](#finite-automata)
+  - [KMP](#kmp)
 
 # Dynamic Programming
 
