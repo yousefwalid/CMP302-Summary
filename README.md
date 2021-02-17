@@ -1354,11 +1354,13 @@ def rabin_karp_matcher(P, T, d, q): # d and q are hash parameters
 ## Finite Automata
   - Build a finite automata for the pattern $P$ and then traverse it on the string.
   - Must build the automata table correctly.
-    - Start from state 0 and calculate where transitions should go
-    - For each state $q$, check if we can reach state $k$ by adding letter $a$
-      - If we can reach $k$ by adding $a$, then $D(q,a)$ is $k$
-      - If we cannot reach $k$ by adding $a$, then decrement $k$ and try again.
-        - By doing this we are looking for the longest possible state.
+    - Find the longest string that is a suffix of $P_q a$
+      - Start from state 0 and calculate where transitions should go
+      - For each state $q$, and on adding a letter $a$
+        - Let $k = q + 1$ 
+        - Check if $P_k$ is suffix of $P_q a$ 
+          - If true, then $D(q, a) = k$
+          - If false, decrement $k$ and try again.
 
 ![](assets/string-matching/fa_01.png)
 
@@ -1373,7 +1375,7 @@ def compute_automata_table(P):
       k = min(m + 1, q + 2) # to avoid overflow
       do
         k = k - 1
-      while P[1..k] is suffix of P[1..q] + c
+      until P[1..k] is suffix of P[1..q] + c
       
       D[q,a] = k
 
@@ -1397,7 +1399,7 @@ def finite_automata_matcher(T, D, m):
 - Main idea is to optimize FA's preprocessing and squeeze the table to only one column.
 - Check only transitions of mismatch
 - The new transition table $\pi$ is computed as follows:
-  - For each state $\pi[i]$, find the longest suffix length in $P$ that is equal to the prefix length of $P$
+  - For each state $\pi[i]$, find the length of the longest suffix in $\pi$ that is also a prefix in $\pi$
 
 <img width=20% src="assets/string-matching/kmp_02.png"> </img> $\rArr$ <img width=50% src="assets/string-matching/kmp_01.png"> </img> 
 
