@@ -1284,3 +1284,156 @@ C_1 \land C_2 \land C_3 \land C_4 =
 (\lnot x_1 \lor \lnot x_2 \lor x_3) \land 
 (x_1 \lor x_2 \lor x_3)$$
 *Try to find subset-sum from the set $\{1001001, 1000110, 100001, 101110, 10011, 11100, 1000, 2000, 100, 200, 10, 20, 1, 2\}$ with $t=1114444$*
+
+# String Matching
+
+Find all occurrences of a string (pattern) $p$ inside another string (text) $t$.
+
+Can also be seen as the shift $s$ that makes $p$ match $t$
+
+![](assets/string-matching/substring.png)
+
+## Naive Approach
+
+- Iterate over all possible overlaps and check if there is a match
+
+```py
+def naive_matcher(P, T):
+  n = T.length
+  m = P.length
+
+  for i in 0:(n-m)
+    if P[1..m] == T[i+1..i+m]
+      # match found
+```
+
+- **Runtime:** $O((n-m+1)m)$
+
+## Rabin-Karp
+
+- Compare hashes instead of comparing strings
+- This is more efficient because we can compute a new hash using previous hash.
+
+$hash(i+1) = (hash(i) - T[i+1]*c_1) * c_2+T[i+m+1]\ mod\ c_3$
+
+This relation corresponds to taking old hash, removing the most significant character, adding the new character, then taking mod.
+![](assets/string-matching/rk_01.png)
+
+```py
+def rabin_karp_matcher(P, T, d, q): # d and q are hash parameters
+  n = T.length
+  m = P.length
+
+  p = 0 # hash of P
+  t = 0 # hash of T
+
+  for i in 1:m
+    p = (d * p + P[i]) mod q # compute hash of pattern P
+    t = (d * p + T[i]) mod q # compute hash of first part of T
+
+  for i in 0:(n-m)
+    if p == t # hashes match
+      if P[1..m] == T[i+1..t+m] # check if collision or not
+        # pattern occurs
+    if i < n - m
+      t = (d * (t - T[i+1] * h) + T[i+m+1]) mod q # update hash of T
+```
+
+- **Runtime:**
+  - Preprocessing: $\Theta(m)$
+  - Matching:
+    - Average case $O(n+m)$
+    - Worst case $O((n-m+1)m)$
+      - Happens if hashes always match.
+
+## Finite Automata
+  - Build a finite automata for the pattern $P$ and then traverse it on the string.
+  - Must build the automata table correctly.
+    - Start from state 0 and calculate where transitions should go
+    - For each state $q$, check if we can reach state $k$ by adding letter $a$
+      - If we can reach $k$ by adding $a$, then $D(q,a)$ is $k$
+      - If we cannot reach $k$ by adding $a$, then decrement $k$ and try again.
+        - By doing this we are looking for the longest possible state.
+
+![](assets/string-matching/fa_01.png)
+
+```py
+def compute_automata_table(P):
+  m = P.length
+
+  D = new matrix m * alphabet_size
+
+  for q in 0:m
+    for each character c in alphabet
+      k = min(m + 1, q + 2) # to avoid overflow
+      do
+        k = k - 1
+      while P[1..k] is suffix of P[1..q] + c
+      
+      D[q,a] = k
+
+  return D
+
+def finite_automata_matcher(T, D, m):
+  n = T.length
+  q = 0
+  for i in 1:n
+    q = D[q, T[i]]  # new state
+    if q == m       # if we reached last state, then there is a match
+      # match occurs
+```
+
+**Runtime**:
+  - Preprocessing: $O(m |\Sigma|)$
+  - Matching: $\Theta(n)$
+
+## KMP
+
+- Main idea is to optimize FA's preprocessing and squeeze the table to only one column.
+- Check only transitions of mismatch
+- The new transition table $\pi$ is computed as follows:
+  - For each state $\pi[i]$, find the longest suffix length in $P$ that is equal to the prefix length of $P$
+
+<img width=20% src="assets/string-matching/kmp_02.png"> </img> $\rArr$ <img width=50% src="assets/string-matching/kmp_01.png"> </img> 
+
+```py
+def compute_KMP_table(P):
+  m = P.length
+  pi[1..m] = new array
+  pi[1] = 0
+
+  k = 0
+
+  for q in 2:m
+    while k > 0 and P[k+1] != P[q] 
+      # while the character does not match next character
+      # keep backtracking
+      k = pi[k]
+    if P[k+1] == P[q]
+      k = k + 1
+    pi[q] = k
+
+  return pi
+
+def KMP_matcher(T, P):
+  n = T.length
+  m = P.length
+  pi = compute_KMP_table(P)
+
+  q = 0
+  for i in 1:n
+    while q > 0 and P[q + 1] != T[i]
+      q = pi[q]
+
+    if P[q+1] == T[i]
+      q = q + 1
+
+    if q == m
+      # match occurs
+      q = pi[q]
+```
+
+- **Runtime:**
+  - Preprocessing: $\Theta(m)$
+  - Matching: $\Theta(n)$
+
